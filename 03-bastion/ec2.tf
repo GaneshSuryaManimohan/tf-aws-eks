@@ -8,7 +8,7 @@ module "bastion_instance" {
   #subnet_id = element(split(",", data.aws_ssm_parameter.public_subnet_ids.value), 0)
   subnet_id = split(",", data.aws_ssm_parameter.public_subnet_ids.value)[0]
   ami = data.aws_ami.ami_info.id
-  user_data = file("bastion.sh")
+  user_data = file("workstation.sh")
   tags = merge(
     var.common_tags,
     {
