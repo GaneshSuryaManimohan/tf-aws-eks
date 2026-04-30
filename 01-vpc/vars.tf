@@ -3,7 +3,7 @@ variable "project_name" {
 }
 
 variable "environment" {
-  type = string
+  type    = string
   default = "dev"
 }
 

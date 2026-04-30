@@ -7,7 +7,7 @@ terraform {
   }
   backend "s3" {
     bucket         = "backend-remote-s3-bucket"
-    key            = "expense-vpc-remote-state"
+    key            = "workstation-eksctl"
     region         = "us-east-1"
     dynamodb_table = "s3-bucket-locking"
   }

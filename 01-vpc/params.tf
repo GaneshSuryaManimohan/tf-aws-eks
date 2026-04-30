@@ -11,8 +11,8 @@ resource "aws_ssm_parameter" "public_subnet_ids" {
 }
 
 resource "aws_ssm_parameter" "private_subnet_ids" {
-  name = "/${var.project_name}/${var.environment}/private_subnet_ids"
-  type = "StringList"
+  name  = "/${var.project_name}/${var.environment}/private_subnet_ids"
+  type  = "StringList"
   value = join(",", module.vpc.private_subnet_ids) # Join list into comma-separated string
 }
 

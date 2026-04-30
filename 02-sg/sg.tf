@@ -80,26 +80,6 @@ resource "aws_security_group_rule" "cluster_bastion" {
   security_group_id = module.cluster.sg_id
 }
 
-# EKS control plane accepting all traffic from nodes
-resource "aws_security_group_rule" "cluster_node" {
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "-1" # All traffic
-  source_security_group_id = module.node.sg_id
-  security_group_id = module.cluster.sg_id
-}
-
-# EKS nodes accepting all traffic from control plane
-resource "aws_security_group_rule" "node_cluster" {
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "-1" # All traffic
-  source_security_group_id = module.cluster.sg_id
-  security_group_id = module.node.sg_id
-}
-
 # EKS nodes should accept all traffic from nodes with in VPC CIDR range.
 resource "aws_security_group_rule" "node_vpc" {
   type              = "ingress"
@@ -150,7 +130,7 @@ resource "aws_security_group_rule" "ingress_public_http" {
   security_group_id = module.ingress.sg_id
 }
 
-#
+# Ingress ALB accepting traffic on 443 from VPC CIDR range (for internal services)
 resource "aws_security_group_rule" "node_ingress" {
   type              = "ingress"
   from_port         = 30000
@@ -158,4 +138,34 @@ resource "aws_security_group_rule" "node_ingress" {
   protocol          = "TCP" # All traffic
   source_security_group_id = module.ingress.sg_id
   security_group_id = module.node.sg_id
+}
+
+# EKS control plane accepting all traffic from nodes
+resource "aws_security_group_rule" "cluster_node" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1" # All traffic
+  source_security_group_id = module.node.sg_id
+  security_group_id = module.cluster.sg_id
+}
+
+#node SG allows inbound from cluster (kubelet, etc.)
+resource "aws_security_group_rule" "node_cluster" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "-1"
+  source_security_group_id = module.cluster.sg_id   # traffic FROM cluster
+  security_group_id        = module.node.sg_id       # allowed INTO nodes
+}
+
+#node SG allows inbound from other nodes (pod-to-pod traffic)
+resource "aws_security_group_rule" "node_node" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "-1"
+  source_security_group_id = module.node.sg_id   # self-referencing
+  security_group_id        = module.node.sg_id
 }
