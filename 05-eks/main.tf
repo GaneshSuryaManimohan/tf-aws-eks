@@ -2,7 +2,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "~> 21.0"
   name               = "expense"
-  kubernetes_version = "1.29"
+  kubernetes_version = "1.30"
 
   endpoint_public_access = true
   # the user which you used to create cluster will get admin access
@@ -22,7 +22,21 @@ module "eks" {
 
   # EKS Managed Node Group(s)
   eks_managed_node_groups = {
-    blue = {
+    # blue = {
+    #   instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+    #   min_size       = 2
+    #   max_size       = 10
+    #   desired_size   = 2
+    #   capacity_type  = "SPOT"
+    #   iam_role_additional_policies = {
+    #     AmazonEBSCSIDriverPolicy          = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+    #     AmazonElasticFileSystemFullAccess = "arn:aws:iam::aws:policy/AmazonElasticFileSystemFullAccess"
+    #     ElasticLoadBalancingFullAccess    = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
+    #   }
+    #   # EKS takes AWS Linux 2 as it's OS to the nodes
+    #   key_name = data.aws_key_pair.eks.key_name
+    # }
+    green = {
       instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
       min_size       = 2
       max_size       = 10
