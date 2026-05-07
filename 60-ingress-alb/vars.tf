@@ -13,5 +13,10 @@ variable "common_tags" {
       Environment = "dev"
       Project     = "expense"
       CreatedBy   = "terraform"
+      Component   = "web-alb"
     }
+}
+
+variable "zone_name" {
+  default = "surya-devops.online"
 }

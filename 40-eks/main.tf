@@ -1,24 +1,33 @@
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 21.0"
-  name               = "expense"
-  kubernetes_version = "1.30"
-
-  endpoint_public_access = true
-  # the user which you used to create cluster will get admin access
-  enable_cluster_creator_admin_permissions = true
+  source                                   = "terraform-aws-modules/eks/aws"
+  version                                  = "~> 21.0"
+  name                                     = "expense"
+  kubernetes_version                       = "1.30"
+  endpoint_public_access                   = false # Should be false for PROD environments, can be true for DEV environments
+  enable_cluster_creator_admin_permissions = true  # This is required to give admin permissions to the user who creates the cluster, so that they can create resources in the cluster. This should be set to false for PROD environments, and the admin permissions should be given to a specific IAM role or user.
   addons = {
     coredns                = {}
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni = {
-      before_compute = true  # install BEFORE nodegroup
+      before_compute = true # install BEFORE nodegroup
     }
   }
   vpc_id                   = local.vpc_id
   subnet_ids               = split(",", local.private_subnet_ids)
   control_plane_subnet_ids = split(",", local.private_subnet_ids)
   node_security_group_id   = local.node_sg_id
+  
+  security_group_additional_rules = {
+    bastion_to_cluster = {
+      description              = "Allow bastion to reach EKS API"
+      protocol                 = "tcp"
+      from_port                = 443
+      to_port                  = 443
+      type                     = "ingress"
+      source_security_group_id = data.aws_security_group.bastion.id
+    }
+  }
 
   # EKS Managed Node Group(s)
   eks_managed_node_groups = {
