@@ -1,10 +1,10 @@
 resource "aws_lb" "ingress_alb" {
   name               = "${var.project_name}-${var.environment}-ingress-alb"
-  internal           = false
+  internal           = false #Public ALB
   load_balancer_type = "application"
-  security_groups    = [data.aws_ssm_parameter.web_alb_sg_id.value]
+  security_groups    = [data.aws_ssm_parameter.ingress_sg_id.value]
   subnets            = split(",", data.aws_ssm_parameter.public_subnet_ids.value) # this will select all private subnets from the comma-separated list
-  enable_deletion_protection = false #Public ALB
+  enable_deletion_protection = false #True for PROD environment
   tags = merge(
     var.common_tags,
     {
@@ -68,6 +68,7 @@ resource "aws_lb_listener_rule" "frontend" {
     }
     condition {
       host_header {
+        #expense-surya-devops.online or expense-dev-surya-devops.online goes to frontend target group
         values = ["expense-${var.environment}.${var.zone_name}"]
       }
     }

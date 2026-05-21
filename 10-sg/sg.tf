@@ -87,7 +87,7 @@ resource "aws_security_group_rule" "node_to_cluster" {
   type                     = "ingress"
   from_port                = 0
   to_port                  = 65535
-  protocol                 = "-1"
+  protocol                 = "-1" #ALL Traffic
   source_security_group_id = module.node.sg_id
   security_group_id        = module.cluster.sg_id
 }
@@ -119,5 +119,55 @@ resource "aws_security_group_rule" "bastion_to_db" {
   to_port                  = 3306
   protocol                 = "tcp"
   source_security_group_id = module.bastion.sg_id
+  security_group_id        = module.db.sg_id
+}
+
+# DB accepting traffic from EKS nodes (if applications running in EKS need to access DB)
+resource "aws_security_group_rule" "node_to_db" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  source_security_group_id = module.node.sg_id
+  security_group_id        = module.db.sg_id
+}
+
+#Ingress accepting traffic from public (for applications exposed via ALB) HTTPS
+resource "aws_security_group_rule" "public_to_ingress" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = module.ingress.sg_id
+}
+
+#Ingress accepting traffic from public (for applications exposed via ALB) HTTP
+resource "aws_security_group_rule" "public_to_ingress_http" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = module.ingress.sg_id
+}
+
+#Ingress accepting traffic from EKS nodes (for applications exposed via NodePort or ClusterIP services)
+resource "aws_security_group_rule" "node_to_ingress" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  source_security_group_id = module.ingress.sg_id
+  security_group_id        = data.aws_ssm_parameter.eks_node_sg_id.value
+}
+
+
+resource "aws_security_group_rule" "eks_managed_node_to_db" {
+  type                     = "ingress"
+  from_port                = 3306
+  to_port                  = 3306
+  protocol                 = "tcp"
+  source_security_group_id = data.aws_ssm_parameter.eks_node_sg_id.value
   security_group_id        = module.db.sg_id
 }

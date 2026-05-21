@@ -55,3 +55,11 @@ chmod 700 get_helm.sh
 
 #Install K9s
 curl -sS https://webinstall.dev/k9s | bash
+
+dnf install mysql -y
+VALIDATE $? "MySQL installation"
+
+#kubens
+git clone https://github.com/ahmetb/kubectx /opt/kubectx
+ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+VALIDATE $? "kubens installation"
