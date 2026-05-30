@@ -12,7 +12,9 @@ It is required when using:
 
 ### Step 1: Associate IAM OIDC Provider
 
-``` eksctl utils associate-iam-oidc-provider --region us-east-1 --cluster expense --approve ```
+```bash
+eksctl utils associate-iam-oidc-provider --region us-east-1 --cluster expense --approve 
+```
 
 * **Purpose**: This command associates an IAM OIDC (OpenID Connect) provider with the EKS cluster.
 
@@ -30,7 +32,9 @@ AWS Load Balancer Controller uses IAM Roles for Service Accounts (IRSA) to secur
 
 ### Step 2: Download IAM Policy
 
-```curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json```
+```bash 
+curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
+```
 
 * **Purpose**: Downloads the recommended IAM policy required by the AWS Load Balancer Controller.
 
@@ -47,7 +51,9 @@ The controller needs permissions to:
 
 ### Step 3: Create IAM Policy
 
-```aws iam create-policy \ --policy-name AWSLoadBalancerControllerIAMPolicy \ --policy-document file://iam_policy.json```
+```bash 
+aws iam create-policy \ --policy-name AWSLoadBalancerControllerIAMPolicy \ --policy-document file://iam_policy.json
+```
 
 * **Purpose**: Creates a custom IAM policy in AWS using the downloaded JSON policy file.
 
@@ -60,7 +66,7 @@ The controller needs permissions to:
 
 ### Step 4: Create IAM Service Account
 
-
+```bash
 eksctl create iamserviceaccount \
   --cluster=expense \
   --namespace=kube-system \
@@ -68,6 +74,7 @@ eksctl create iamserviceaccount \
   --role-name AmazonEKSLoadBalancerControllerRole \
   --attach-policy-arn=arn:aws:iam::328342418911:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
+```
 
 * **Purpose**: Creates a Kubernetes Service Account and attaches an IAM role to it.
 
@@ -81,7 +88,7 @@ This step:
 
 ### Step 5: Add EKS Helm Repository
 
-helm repo add eks https://aws.github.io/eks-charts
+```bash helm repo add eks https://aws.github.io/eks-charts ```
 
 * **Purpose**: Adds the official AWS EKS Helm chart repository.
 
@@ -93,9 +100,11 @@ This repository contains:
 
 ### Step 6: Install AWS Load Balancer Controller
 
+```bash 
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   -n kube-system \
   --set clusterName=expense
+```
 
 * **Purpose**: Installs the AWS Load Balancer Controller into the EKS cluster.
 
@@ -115,7 +124,9 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
 
 #### Verification
 **Verify Controller Pods**
+```bash 
 kubectl get pods -n kube-system
+```
 
 **Expected output:**
 aws-load-balancer-controller-xxxxx Running
@@ -125,6 +136,3 @@ aws-load-balancer-controller-xxxxx Running
 
 terraform destroy -target=aws_security_group_rule.eks_managed_node_to_db
 terraform destroy -target=aws_security_group_rule.node_to_ingres
-
-
-#
