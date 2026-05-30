@@ -135,4 +135,4 @@ aws-load-balancer-controller-xxxxx Running
 -------------------------------------------------
 
 terraform destroy -target=aws_security_group_rule.eks_managed_node_to_db
-terraform destroy -target=aws_security_group_rule.node_to_ingres
+terraform destroy -target=aws_security_group_rule.node_to_ingress

@@ -152,22 +152,22 @@ resource "aws_security_group_rule" "public_to_ingress_http" {
   security_group_id        = module.ingress.sg_id
 }
 
-#Ingress accepting traffic from EKS nodes (for applications exposed via NodePort or ClusterIP services)
-resource "aws_security_group_rule" "node_to_ingress" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 65535
-  protocol                 = "tcp"
-  source_security_group_id = module.ingress.sg_id
-  security_group_id        = data.aws_ssm_parameter.eks_node_sg_id.value
-}
+# #Ingress accepting traffic from EKS nodes (for applications exposed via NodePort or ClusterIP services)
+# resource "aws_security_group_rule" "node_to_ingress" {
+#   type                     = "ingress"
+#   from_port                = 0
+#   to_port                  = 65535
+#   protocol                 = "tcp"
+#   source_security_group_id = module.ingress.sg_id
+#   security_group_id        = data.aws_ssm_parameter.eks_node_sg_id.value
+# }
 
 
-resource "aws_security_group_rule" "eks_managed_node_to_db" {
-  type                     = "ingress"
-  from_port                = 3306
-  to_port                  = 3306
-  protocol                 = "tcp"
-  source_security_group_id = data.aws_ssm_parameter.eks_node_sg_id.value
-  security_group_id        = module.db.sg_id
-}
+# resource "aws_security_group_rule" "eks_managed_node_to_db" {
+#   type                     = "ingress"
+#   from_port                = 3306
+#   to_port                  = 3306
+#   protocol                 = "tcp"
+#   source_security_group_id = data.aws_ssm_parameter.eks_node_sg_id.value
+#   security_group_id        = module.db.sg_id
+# }
