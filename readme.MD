@@ -68,11 +68,12 @@ aws iam create-policy \ --policy-name AWSLoadBalancerControllerIAMPolicy \ --pol
 
 ```bash
 eksctl create iamserviceaccount \
-  --cluster=expense \
-  --namespace=kube-system \
-  --name=aws-load-balancer-controller \
+  --cluster expense \
+  --namespace kube-system \
+  --name aws-load-balancer-controller \
   --role-name AmazonEKSLoadBalancerControllerRole \
-  --attach-policy-arn=arn:aws:iam::328342418911:policy/AWSLoadBalancerControllerIAMPolicy \
+  --attach-policy-arn arn:aws:iam::328342418911:policy/AWSLoadBalancerControllerIAMPolicy \
+  --override-existing-serviceaccounts \
   --approve
 ```
 
@@ -88,7 +89,9 @@ This step:
 
 ### Step 5: Add EKS Helm Repository
 
-```bash helm repo add eks https://aws.github.io/eks-charts ```
+```bash 
+helm repo add eks https://aws.github.io/eks-charts
+```
 
 * **Purpose**: Adds the official AWS EKS Helm chart repository.
 
@@ -134,5 +137,5 @@ aws-load-balancer-controller-xxxxx Running
 
 -------------------------------------------------
 
-terraform destroy -target=aws_security_group_rule.eks_managed_node_to_db
-terraform destroy -target=aws_security_group_rule.node_to_ingress
+* terraform destroy -target=aws_security_group_rule.eks_managed_node_to_db
+* terraform destroy -target=aws_security_group_rule.node_to_ingress
